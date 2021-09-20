@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -18,10 +19,11 @@ type Config struct {
 }
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	config   *Config
-	snippets *mysql.SnippetModel
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	config        *Config
+	snippets      *mysql.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func getConfig() *Config {
@@ -39,14 +41,19 @@ func main() {
 	logInfo := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	logError := log.New(os.Stdout, "ERROR \t", log.Ldate|log.Ltime|log.Lshortfile)
 	config := getConfig()
-
 	db, err := openDB(config)
 
+	templateCache, err := newTemplateCache("./ui/html/")
+	if err != nil {
+		logError.Fatal(err)
+	}
+
 	app := &application{
-		errorLog: logError,
-		infoLog:  logInfo,
-		config:   config,
-		snippets: &mysql.SnippetModel{DB: db},
+		errorLog:      logError,
+		infoLog:       logInfo,
+		config:        config,
+		snippets:      &mysql.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	if err != nil {
