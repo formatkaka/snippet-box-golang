@@ -6,6 +6,7 @@ import (
 
 	"path/filepath"
 
+	"github.com/formatkaka/snippet-box-golang/pkg/forms"
 	"github.com/formatkaka/snippet-box-golang/pkg/models"
 )
 
@@ -17,6 +18,7 @@ type templateData struct {
 	CurrentYear int
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
+	Form        *forms.Form
 }
 
 func humanDate(t time.Time) string {
